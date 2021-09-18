@@ -3,6 +3,12 @@ from werkzeug.utils import secure_filename
 import numpy as np
 import struct
 import os
+import numpy as np
+from numpy.lib.npyio import save
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+from keras.models import load_model
+import json
 app = Flask(__name__)
 
 #main page
@@ -32,7 +38,8 @@ def upload_file():
     if request.method == 'POST':
         f = request.files['file']
         f_name = secure_filename(f.filename)
-        f.save(os.path.join('/home/ubuntu/webpage/', f_name))
+        path_dir = '/home/ubuntu/webpage/static/data/'
+        f.save(os.path.join(path_dir, f_name))
         print(f_name)
         #f.save('/home/ubuntu/my_tensorflow/uploads/'+secure_filename(f.filename))
         #temp_list = np.loadtxt(f, dtype='float')
@@ -40,21 +47,25 @@ def upload_file():
         #temp_list = np.array(map(float, temp_string.split()))
         #print(temp_list)
 
-        """
-        for i in temp_list:
-            if i == '-':
-                check = True
-            elif i == 'end':
-                flag = False
-            else:
-                if check:
-                    check = False
-                    temp_list_f.append(float(i)*-1)
-                else:
-                    temp_list_f.append(float(i))
-        print(temp_list_f)
-        """
-        return render_template('send_result.html')
+        f = open(os.path.join(path_dir, f_name), "r")
+        content = f.read()
+        content_list = content.split(" ")
+        f.close()
+        #print(len(content_list))
+        temp_list = []
+        for i in content_list:
+            if i != '':
+                temp_list.append(float(i))
+        
+        print(len(temp_list))
+        data_arr = np.array(temp_list[:210000])
+        print(np.shape(data_arr))
+        data_arr = np.reshape(data_arr, (1, 500, 420))
+        print(np.shape(data_arr))
+        model = load_model('../server/eeg_deeplearning_conv1d_lstm.h5')
+        result = model.predict(data_arr)
+
+        return render_template('send_result.html', value=result)
 
 if __name__ == '__main__':
     app.debug = True
