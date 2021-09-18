@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 import numpy as np
 import struct
+import os
 app = Flask(__name__)
 
 #main page
@@ -22,21 +23,24 @@ def record():
 #upload html rendering
 @app.route('/upload')
 def render_file():
-    return render_template('send_file.html')
+    return render_template('eeg.html')
 
 #file upload work
-@app.route('/fileUpload', methods = ['GET', 'POST'])
+@app.route('/fileUpload', methods = ['POST'])
 def upload_file():
-    temp_list_f = []
 
     if request.method == 'POST':
-        f = request.files['file'].read()
+        f = request.files['file']
+        f_name = secure_filename(f.filename)
+        f.save(os.path.join('/home/ubuntu/webpage/', f_name))
+        print(f_name)
         #f.save('/home/ubuntu/my_tensorflow/uploads/'+secure_filename(f.filename))
         #temp_list = np.loadtxt(f, dtype='float')
-        temp_string = f.decode()
-        temp_list = np.array(map(float, temp_string.split()))
-        print(temp_list)
+        #temp_string = f.decode()
+        #temp_list = np.array(map(float, temp_string.split()))
+        #print(temp_list)
 
+        """
         for i in temp_list:
             if i == '-':
                 check = True
@@ -49,7 +53,7 @@ def upload_file():
                 else:
                     temp_list_f.append(float(i))
         print(temp_list_f)
-
+        """
         return render_template('send_result.html')
 
 if __name__ == '__main__':
