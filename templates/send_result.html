@@ -22,7 +22,11 @@
 			</nav>
 			<a class="cta" href="https://github.com/KimJaea/JaeJu-GetEEG" target="_blank"><button>Contact</button></a>
 		</header>
-        <p>끝- 재아 똥 굵다</p>
-		<p>{{value}}를 전달받았다</p>
+		<p>{{value}}이다!</p>
+		<script type="text/javascript">
+			var dp = {{ value|tojson }};
+			document.write("<p>"+dp[0]+"</p>");
+			document.write("<p>"+dp[1]+"</p>");
+		</script>
 	</body>
 </html>

@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from keras.models import load_model
 import json
+import datetime as dt
 app = Flask(__name__)
 
 #main page
@@ -24,6 +25,7 @@ def map():
 #records page
 @app.route('/statistics')
 def record():
+    #통계 호출
     return render_template('graph.html')
 
 #upload html rendering
@@ -37,8 +39,11 @@ def upload_file():
 
     if request.method == 'POST':
         f = request.files['file']
-        f_name = secure_filename(f.filename)
+        #f_name = secure_filename(f.filename)
+        x = dt.datetime.now()
+        f_name = str(x.year)+"_"+str(x.month)+"_"+str(x.day)+".json" 
         path_dir = '/home/ubuntu/webpage/static/data/'
+        
         f.save(os.path.join(path_dir, f_name))
         print(f_name)
         #f.save('/home/ubuntu/my_tensorflow/uploads/'+secure_filename(f.filename))
@@ -64,8 +69,34 @@ def upload_file():
         print(np.shape(data_arr))
         model = load_model('../server/eeg_deeplearning_conv1d_lstm.h5')
         result = model.predict(data_arr)
+        result = result.tolist()
+        print(result)
+        #json으로 결과 저장
+        threshold = 0.4
+        send_data = []
+        if result[0][1] >= threshold:
+            send_data.append(1)
+            send_data.append(result[0][1])
+        else:
+            send_data.append(0)
+            send_data.append(result[0][0])
+        
+        #send_data = [0, 0.9159774780273438]
 
-        return render_template('send_result.html', value=result)
+        big_data = {}
+
+        with open('./static/data/depression_result.json', 'r') as f:
+            big_data = json.load(f)
+
+        data = {}
+        data['result'] = send_data[0]
+        data['percent'] = send_data[1]
+        big_data[str(x.year)+"_"+str(x.month)+"_"+str(x.day)] = data
+        
+        with open('./static/data/depression_result.json', 'w') as outfile:
+            json.dump(big_data, outfile, indent="\t")
+
+        return render_template('send_result.html', value=send_data)
 
 if __name__ == '__main__':
     app.debug = True
