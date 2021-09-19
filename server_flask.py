@@ -41,7 +41,7 @@ def upload_file():
         f = request.files['file']
         #f_name = secure_filename(f.filename)
         x = dt.datetime.now()
-        f_name = str(x.year)+"_"+str(x.month)+"_"+str(x.day)+".json" 
+        f_name = str(x.year)+"_"+str(x.month)+"_"+str(x.day)+".txt" 
         path_dir = '/home/ubuntu/webpage/static/data/'
         
         f.save(os.path.join(path_dir, f_name))
