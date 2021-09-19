@@ -10,6 +10,8 @@ import pandas as pd
 from keras.models import load_model
 import json
 import datetime as dt
+import boto3
+
 app = Flask(__name__)
 
 #main page
@@ -25,8 +27,58 @@ def map():
 #records page
 @app.route('/statistics')
 def record():
-    #통계 호출
-    return render_template('graph.html')
+    send_data = []
+    #get depression_result
+    depression_data = []
+    temp_data = {}
+    with open('./static/data/depression_result.json', 'r') as f:
+        temp_data = json.load(f)
+    
+    for d in temp_data:
+        d_data = []
+        d_data.append(d)
+        d_data.append(temp_data[d]['result'])
+        d_data.append(temp_data[d]['percent'])
+        depression_data.append(d_data)
+    
+    print(depression_data)
+    
+    #get eeg data
+    eeg_data = []
+    file_name = depression_data[-1][0] + ".txt"
+    f = open(os.path.join('./static/data/', file_name), "r")
+    content = f.read()
+    content_list = content.split(" ")
+    f.close()
+
+    for i in content_list:
+        if i != '':
+            eeg_data.append(float(i))
+
+    print(eeg_data[0])
+    print(type(eeg_data))
+
+    #get intent
+    intent = []
+    dynamodb = boto3.resource('dynamodb', region_name='ap-northeast-2')
+    table = dynamodb.Table('user_database')
+    response = table.scan()
+    items = response['Items']
+    for item in items:
+        temp_intent = []
+        for n in item['events'][3]['parse_data']['intent_ranking']:
+            if n['confidence'] > 0.8:
+                temp_intent.append(n['name'])
+        if (len(temp_intent)!=0):
+            intent.append(temp_intent)
+
+    print(intent)
+
+    send_data.append(depression_data)
+    send_data.append(eeg_data)
+    send_data.append(intent)
+
+    return render_template('graph.html', value=send_data)
 
 #upload html rendering
 @app.route('/upload')
