@@ -49,6 +49,8 @@ function init() {
 	loadModel();
 	loadText('선택하세요', new THREE.Vector3(-50, 50, 0));
 	
+	currentLocation();
+	
 	// Set Renderer
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 	renderer.setSize( window.innerWidth * ratioWidth, window.innerHeight * ratioHeight );
@@ -113,6 +115,7 @@ function loadModel() {
 		obj.children[0].children[0].material.color.set(0x349943) // Lighter
 		scene.add( obj );
 	})
+
 }
 
 function loadText(string_name, string_loc) {
@@ -137,6 +140,56 @@ function loadText(string_name, string_loc) {
 		text.rotateX(50)
 		scene.add(text)
 	})
+}
+
+function currentLocation() {
+	navigator.geolocation.getCurrentPosition(handleLocation, handleError); 
+	
+    function handleLocation(position)  {    
+		var geocoder = new google.maps.Geocoder;
+		var latlng = {
+			lat: parseFloat(position.coords.latitude),
+			lng: parseFloat(position.coords.longitude)
+		};
+		
+		geocoder.geocode({ location: latlng }).then((response) => {
+			var stringLoc = response.results[0].formatted_address
+    		var stringGu = stringLoc.split(' ')[2];
+
+			// Pop-Up Current Location Gu
+			for(let i = 0; i < locations.length; i++) {
+				if(stringGu == locations[i]) {
+					var object = objects[i];
+					object_selected = object;
+					object.scale.z *= 2;
+					object.position.add(new THREE.Vector3(0, 1, 0))
+					
+					var name = object.name;
+					for(let i = 0; i < objects.length; i++) {
+						if(name == objects[i].name) {
+							name = locations[i]
+						}
+					}
+					var loc = new THREE.Vector3(object.position.x - 65, 10, object.position.z - 50);
+					loadText(name, loc);
+			
+					getStatement(object.name);
+				}
+			}
+		});
+    } 
+
+    // Error Call-Back 
+    function handleError(err) {
+        var outDiv = document.getElementById("result");
+        if(err.code == 1) {
+            console.log("위치 검색을 허용해 주세요.");
+        }
+        else {
+            console.log("에러가 발생했습니다.\n" + err.code);
+        }
+	}
+	
 }
 
 function onDocumentMouseDown(event) {

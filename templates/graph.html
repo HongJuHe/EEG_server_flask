@@ -14,7 +14,7 @@
         <img class="logo" src="../static/assets//J.png" alt="logo">
         <nav>
             <ul class="nav__links">
-                <li><a id="button1" href="/index">Main</a></li>
+                <li><a id="button1" href="/">Main</a></li>
                 <li><a id="button2" href="/eeg">Send EEG</a></li>
                 <li><a id="button3" href="/map">Hospital</a></li>
                 <li><a id="button4" href="#">Record</a></li>
@@ -25,10 +25,7 @@
     <div class="announcement-whole">
         <br>마우스를 이용해 화면을 움직여보세요.
     </div>
-    <div class="eeg"> {{value}} </div>
-    <script>
-        document.getElementById("eeg").style.display="none";
-    </script>
+    <div id="eeg" style="display: none"> {{value}} </div>
 	<script type = "module" src="../static/js/graph.js"></script>
 </body>
 </html>

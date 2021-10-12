@@ -23,7 +23,7 @@ function init() {
 	document.body.appendChild( container );
 	// Set Camera
 	camera = new THREE.PerspectiveCamera( 75, (window.innerWidth * ratioWidth) / (window.innerHeight * ratioHeight), 0.5, 1000 );
-	camera.position.set( -30, 20, -30 );
+	camera.position.set( 0, 15, -5 );
 	// Set Scene
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color( 0x6dddff );
@@ -64,8 +64,8 @@ function init() {
 	controls.enableZoom = true
 	controls.enableDamping = true
 	controls.minDistance = 10;
-	controls.maxDistance = 40;
-	controls.target.set( -48, 5, -48 );
+	controls.maxDistance = 20;
+	controls.target.set( 0, 5, 0 );
 	controls.update();
 
 	// Stats
@@ -86,6 +86,7 @@ function animate() {
 	var delta = clock.getDelta();
 	if ( mixer ) mixer.update( delta );
 	if ( model ) moveModel(); // KeyDown & KeyUp
+	controls.update();
 	renderer.render( scene, camera );
 	stats.update();
 }
@@ -100,8 +101,8 @@ function loadModel() {
 	// GLTF Object with animation - Model
 	var loader = new GLTFLoader().setPath('../static/assets/')
 	loader.load('merged_y.glb', function(gltf) {
-		gltf.scene.scale.setScalar(0.13)
-		gltf.scene.position.set(-47, 0, -47)
+		gltf.scene.scale.setScalar(0.1)
+		gltf.scene.position.set(0, 0.4, 0)
 		scene.add( gltf.scene );
 
 		mixer = new THREE.AnimationMixer( gltf.scene );
@@ -157,19 +158,19 @@ function loadModel() {
 	// GLB Object without animation - City
 	loader.load('city.glb', function(gltf){
 		gltf.scene.scale.setScalar(0.1)
-		gltf.scene.position.set(0, 12, 0)
+		gltf.scene.position.set(0, 0, 0)
 		scene.add(gltf.scene);
 	})
 
 	// Load Text above Building
 	// Up-Right
-	loadTextEng("Send EEG", new THREE.Vector3(-25, 20, -75), -Math.PI / 4); 
+	loadTextEng("Send EEG", new THREE.Vector3(-10, 15, 20), 2); 
 	// Up-Left
-	loadTextEng("Hospital", new THREE.Vector3(-75, 20, -65), Math.PI / 4); 
+	loadTextEng("Hospital", new THREE.Vector3(20, 15, 15), -2.3); 
 	// Down-Left
-	loadTextEng("Record", new THREE.Vector3(-75, 20, -20), Math.PI / 4* 3); 
+	loadTextEng("Record", new THREE.Vector3(15, 15, -20), -0.5); 
 	// Down-Right
-	loadTextEng("Contact", new THREE.Vector3(-15, 20, -25), -Math.PI / 4* 3); 
+	loadTextEng("Contact", new THREE.Vector3(-20, 15, -15), 0.5); 
 }
 
 function moveModel() {
@@ -207,6 +208,8 @@ function moveModel() {
 		model.getWorldDirection(direction);
 		direction.multiplyScalar(current_walkSpeed)
 		model.position.add(direction);
+		controls.target.add(direction);
+		camera.position.add(direction);
 	}
 	if(moveBackward) {
 		var direction = new THREE.Vector3()
@@ -214,7 +217,9 @@ function moveModel() {
 		
 		direction.multiplyScalar(current_walkSpeed)
 		direction.negate()
-		model.position.add(direction);	
+		model.position.add(direction);
+		controls.target.add(direction);
+		camera.position.add(direction);	
 	}
 	if(turnLeft) {
 		model.rotation.y += current_turnSpeed;
@@ -224,23 +229,23 @@ function moveModel() {
 	}
 
 	// Up-Right // Send EEG
-	if(model.position.x > -30 && model.position.z < -60) {
-		keyReset(new THREE.Vector3(-31, 0, -59));
+	if(model.position.x < -15 && model.position.z > 15) {
+		keyReset(new THREE.Vector3(-14, 0.4, 14));
 		loadPopUp("뇌파 측정", "/eeg");
 	}
 	// Up-Left // Hospital
-	if(model.position.x < -60 && model.position.z < -60) {
-		keyReset(new THREE.Vector3(-59, 0, -59));
+	if(model.position.x > 15 && model.position.z > 15) {
+		keyReset(new THREE.Vector3(14, 0.4, 14));
 		loadPopUp("병원 추천", "/map");
 	}
 	// Down-Left // Record
-	if(model.position.x < -60 && model.position.z > -30) {
-		keyReset(new THREE.Vector3(-59, 0, -31));
+	if(model.position.x > 15 && model.position.z < - 15) {
+		keyReset(new THREE.Vector3(14, 0.4, -14));
 		loadPopUp("기록 확인", "/graph");
 	}
 	// Down-Right // Contact
-	if(model.position.x > -30 && model.position.z > -30) {
-		keyReset(new THREE.Vector3(-31, 0, -31));
+	if(model.position.x < -15 && model.position.z < -15) {
+		keyReset(new THREE.Vector3(-14, 0.4, -14));
 		loadPopUp("개발자 Git Hub", "https://github.com/KimJaea/JaeJu-GetEEG");
 	}
 }

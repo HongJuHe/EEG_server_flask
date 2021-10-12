@@ -97,11 +97,18 @@ function loadModel() {
 	// import data from server
     // 3 Dementional Data from 'EEG_Wiset_Web'
     //var dp = {{ value|tojson }};
-	const data = document.getElementById("eeg").innerText;
-	
-    var data_eeg = data[0];
-	var data_raw = data[1];
-    var data_chat = data[2];
+	var data = document.getElementById("eeg").innerHTML;
+	data = data.replaceAll("'", '"')
+	//console.log(data)
+	//console.log(typeof(data))
+	data = '{"eeg_data":' + data;
+	data = data + '}'
+	//console.log(data)
+	var data_j = JSON.parse(data)
+	//console.log(data_j.eeg_data[0])
+    var data_eeg = data_j.eeg_data[0];
+	var data_raw = data_j.eeg_data[1];
+    var data_chat = data_j.eeg_data[2];
 
 	// Load Pie Chart & Text - Depression
 	var pieValues = [0, 0];
