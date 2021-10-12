@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<title>Project JaeJu Main Page</title>
+		<title>Project JaeJu Main</title>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<meta name="description" content="Project JaeJu" />
@@ -10,7 +10,8 @@
 		<link type="text/css" rel="stylesheet" href="../static/css/main.css">
 	</head>	
 	<body>
-		<script>
+		<!-- Chat Bot -->
+		<script type="text/javascript" language="JavaScript">
 			!(function () {
 			let e = document.createElement("script"),
 			t = document.head || document.getElementsByTagName("head")[0];
@@ -30,26 +31,51 @@
 			}),
 			t.insertBefore(e, t.firstChild);
 		})();
-
+		// Disappear Element
 		function hideDiv (){
-			  document.getElementById("ann").style.display="none";
+			document.getElementById("ann").style.display="none";
+		}
+		self.setTimeout("hideDiv()",5000);	
+		// Button Work
+		function buttonConfirm () {
+			const address = document.getElementById('address').innerText;
+			if(address) {
+				window.open(address, "page");
 			}
-			self.setTimeout("hideDiv()",5000);
+			document.getElementById("popup").style.display="none";
+		}
+		function buttonCancel () {
+			document.getElementById("popup").style.display="none";
+		}
 		</script>
 		<header>
 			<img class="logo" src="../static/assets//J.png" alt="logo">
 			<nav>
 				<ul class="nav__links">
 					<li><a id="button1" href="#">Main</a></li>
-					<li><a id="button2" href="/upload">Send EEG</a></li>
+					<li><a id="button2" href="/eeg">Send EEG</a></li>
 					<li><a id="button3" href="/map">Hospital</a></li>
-					<li><a id="button4" href="/statistics">Record</a></li>
+					<li><a id="button4" href="/graph">Record</a></li>
 				</ul>
 			</nav>
 			<a class="cta" href="https://github.com/KimJaea/JaeJu-GetEEG" target="_blank"><button>Contact</button></a>
 		</header>
-		<div class="announcement">
-			챗봇과의 채팅을 시작하려면 캐릭터를 클릭하세요. 일정 시간 후 지워지게
+		<div class="announcement-whole" id="ann">
+			<br><br>캐릭터를 클릭해 챗봇과의 채팅을 시작할 수 있습니다.
+		</div>
+
+		<div id="address" style="display: none;"></div>
+		<div id="popup" class="layer_popup" style="display: block;">
+			<div class="layer">
+				<div class="text_area" id="text_area">
+					<p> 환영합니다. 마우스와 키보드를 이용해 자유롭게 움직여보세요. </p>
+				</div>
+				<div class="btn_area">
+					<button class="btn_confirm" id="btn_confirm" onclick="buttonConfirm()">확인</button>
+					<button class="btn_cancel" id="btn_cancel" onclick="buttonCancel()">취소</button>
+				</div>
+			</div>
+			<div class="dimmed"></div>
 		</div>
 		<script type = "module" src="../static/js/index.js"></script>
 	</body>

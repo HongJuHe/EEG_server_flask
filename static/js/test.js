@@ -101,7 +101,7 @@ function onWindowResize() {
 
 function loadModel() {
 	// GLTF Object with animation - mesh
-	var loader = new GLTFLoader().setPath('./assets/')
+	var loader = new GLTFLoader().setPath('../static/assets/')
 	loader.load('merged_y.glb', function(gltf) {
 		gltf.scene.scale.setScalar(0.13)
 		gltf.scene.position.set(-47, 0, -47)
@@ -214,7 +214,7 @@ function changeAnimation(pose) {
 	// cancelAnimationFrame(requestAnimationFrame(animate))
 	// console.log('멈춤')
 
-	var loader = new GLTFLoader().setPath('./assets/')
+	var loader = new GLTFLoader().setPath('../static/assets/')
 	loader.load( pose, function ( gltf ) {
 		mixer = new THREE.AnimationMixer( gltf.scene );
 		var action = mixer.clipAction( gltf.animations[ 0 ] );

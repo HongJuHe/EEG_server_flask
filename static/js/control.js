@@ -14,6 +14,8 @@ var camera, scene, renderer;
 var moveForward = false, moveBackward = false, turnLeft = false, turnRight = false;
 var model, lastAction, activeAction, current_walkSpeed = 0, current_turnSpeed = 0;
 
+var cameraTarget = new THREE.Vector3;
+
 init();
 animate();
 onWindowResize();
@@ -23,8 +25,9 @@ function init() {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	// Set Camera
-	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.5, 500 );
+	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.5, 50000 );
 	camera.position.set( -30, 20, -30 );
+	cameraTarget.set(-47, 17, -47);
 	// Set Scene
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color( 0x6dddff );
@@ -79,14 +82,17 @@ function init() {
 		controls.update()
 	}
 	tick()
-
 }
 
 function animate() {
 	requestAnimationFrame( animate );
 	var delta = clock.getDelta();
 	if ( mixer ) mixer.update( delta );
-	if ( model ) moveModel(); // KeyDown & KeyUp
+	if ( model ) {
+		moveModel();
+		camera.position.lerp(cameraTarget, 0.2);
+		camera.lookAt( model.position );
+	}
 	renderer.render( scene, camera );
 	stats.update();
 }
@@ -99,7 +105,7 @@ function onWindowResize() {
 
 function loadModel() {
 	// GLTF Object with animation - mesh
-	var loader = new GLTFLoader().setPath('./assets/')
+	var loader = new GLTFLoader().setPath('../static/assets/')
 	loader.load('merged_y.glb', function(gltf) {
 		gltf.scene.scale.setScalar(0.13)
 		gltf.scene.position.set(-47, 0, -47)
@@ -112,8 +118,6 @@ function loadModel() {
 		action1.play();
 		lastAction = action1;
 		activeAction = action1;
-		// action0.setEffectiveWeight(0)
-		// action1.setEffectiveWeight(1)
 
 		model = gltf.scene
 		// Move Character with Key
@@ -154,27 +158,9 @@ function loadModel() {
 				gltf.scene.position.set(-47, 0, -47)
 				console.log("RESET POSITION BY SPACE BAR")
 			}
-			// action0.fadeOut(0.5)
-			// action0.stop();
-			// action1.fadeIn(0.5)
-			// action1.play();
-			//action0.crossFadeFrom(action1, 1, true);
-			//action0.fadeOut(1)
-			//action1.fadeIn(1)
-			//action0.setEffectiveWeight(0)
-			//action1.setEffectiveWeight(1)
-			//action0.stop();
-			//action1.play();
-			//console.log("RESTART WALKING")
 		};
 	})
 
-	// // GLTF Object without animation - Chair
-	// loader.load('chair.gltf', function(gltf) {
-	// 	gltf.scene.scale.set(5.0, 5.5, 5.0)
-	// 	gltf.scene.position.set(-47, 0, -49)
-	// 	scene.add( gltf.scene )
-	// })
 
 	loader.load('city.glb', function(gltf){
 		gltf.scene.scale.setScalar(0.1)
@@ -222,7 +208,6 @@ function moveModel() {
 	if(moveBackward) {
 		var direction = new THREE.Vector3()
 		model.getWorldDirection(direction);
-		
 		direction.multiplyScalar(current_walkSpeed)
 		direction.negate()
 		model.position.add(direction);	

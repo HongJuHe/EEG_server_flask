@@ -11,20 +11,24 @@
 	</head>	
 	<body>
 		<header>
-			<img class="logo" src="../static/assets//J.png" alt="logo">
+			<img class="logo" src="../static/assets/J.png" alt="logo">
 			<nav>
 				<ul class="nav__links">
 					<li><a id="button1" href="/">Main</a></li>
 					<li><a id="button2" href="#">Send EEG</a></li>
 					<li><a id="button3" href="/map">Hospital</a></li>
-					<li><a id="button4" href="/statistics">Record</a></li>
+					<li><a id="button4" href="/graph">Record</a></li>
 				</ul>
 			</nav>
 			<a class="cta" href="https://github.com/KimJaea/JaeJu-GetEEG" target="_blank"><button>Contact</button></a>
 		</header>
-        <form action="/fileUpload" method="POST" enctype="multipart/form-data">
-            <input type= "file" value = "파일 선택" name="file"/>
-            <input type= "submit" value = "파일 전송">
-        </form>
+		<div class="announcement-whole-unclickable">
+			<br>측정한 뇌파 데이터를 송신해 우울증을 판단해보세요.<br><br>
+			<form action = "/fileUpload" method = "POST" enctype="multipart/form-data">
+				<input type = "file" class="btn btn-xl btn-light me-4" value = "파일 선택" name = "file"/>
+				<input type = "submit" class="btn btn-xl btn-dark" value = "파일 전송" class="btn btn-xl btn-light me-4">
+			</form><br>
+		</div>
+		<script type = "module" src="../static/js/dance.js"></script>
 	</body>
 </html>

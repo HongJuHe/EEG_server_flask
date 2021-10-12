@@ -4,7 +4,8 @@ import {GLTFLoader} from 'https://threejsfundamentals.org/threejs/resources/thre
 import Stats from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/libs/stats.module.js'
 
 var container, stats, controls, mixer, clock;
-var camera, scene, renderer;
+var camera, scene, renderer, geometry, text;
+var ratioWidth = 1.0, ratioHeight = 0.9;
 
 var moveForward = false, moveBackward = false, turnLeft = false, turnRight = false;
 var model, lastAction, activeAction, current_walkSpeed = 0, current_turnSpeed = 0;
@@ -21,7 +22,7 @@ function init() {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	// Set Camera
-	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / (window.innerHeight * 0.9), 0.5, 500 );
+	camera = new THREE.PerspectiveCamera( 75, (window.innerWidth * ratioWidth) / (window.innerHeight * ratioHeight), 0.5, 1000 );
 	camera.position.set( -30, 20, -30 );
 	// Set Scene
 	scene = new THREE.Scene();
@@ -45,10 +46,10 @@ function init() {
 
 	// Load Models
 	loadModel();
-
+	
 	// Set Renderer
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-	renderer.setSize( window.innerWidth, window.innerHeight * 0.9 );
+	renderer.setSize( window.innerWidth * ratioWidth, window.innerHeight * ratioHeight );
 	renderer.setPixelRatio( Math.min(window.devicePixelRatio, 2) );
 	renderer.setAnimationLoop();
 	renderer.gammaOutput = true;
@@ -78,23 +79,6 @@ function init() {
 		controls.update()
 	}
 	tick()
-
-	// Action when button clicked
-	/*const btn1 = document.querySelector('#button1');
-	btn1.addEventListener('click', () => { // Send EEG
-		camera.position.set(-30, 50, -60);
-		window.open("http://" + location.hostname + ":" + location.port + "/eeg.html");
-	})
-	const btn3 = document.querySelector('#button2');
-	btn3.addEventListener('click', () => { // Hospital
-		camera.position.set(-60, 50, -30);
-		window.open("http://" + location.hostname + ":" + location.port + "/map.html");
-	})
-	const btn4 = document.querySelector('#button3');
-	btn4.addEventListener('click', () => { // Record
-		camera.position.set(-30, 50, -30);
-		window.open("http://" + location.hostname + ":" + location.port + "/graph.html");
-	})*/
 }
 
 function animate() {
@@ -107,14 +91,14 @@ function animate() {
 }
 
 function onWindowResize() {
-	camera.aspect = window.innerWidth / (window.innerHeight * 0.9);
+	camera.aspect = (window.innerWidth * ratioWidth) / (window.innerHeight * ratioHeight );
 	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth, window.innerHeight * 0.9 );
+	renderer.setSize( window.innerWidth * ratioWidth, window.innerHeight * ratioHeight );
 }
 
 function loadModel() {
 	// GLTF Object with animation - Model
-	var loader = new GLTFLoader().setPath('./static/assets/')
+	var loader = new GLTFLoader().setPath('../static/assets/')
 	loader.load('merged_y.glb', function(gltf) {
 		gltf.scene.scale.setScalar(0.13)
 		gltf.scene.position.set(-47, 0, -47)
@@ -176,6 +160,16 @@ function loadModel() {
 		gltf.scene.position.set(0, 12, 0)
 		scene.add(gltf.scene);
 	})
+
+	// Load Text above Building
+	// Up-Right
+	loadTextEng("Send EEG", new THREE.Vector3(-25, 20, -75), -Math.PI / 4); 
+	// Up-Left
+	loadTextEng("Hospital", new THREE.Vector3(-75, 20, -65), Math.PI / 4); 
+	// Down-Left
+	loadTextEng("Record", new THREE.Vector3(-75, 20, -20), Math.PI / 4* 3); 
+	// Down-Right
+	loadTextEng("Contact", new THREE.Vector3(-15, 20, -25), -Math.PI / 4* 3); 
 }
 
 function moveModel() {
@@ -229,46 +223,34 @@ function moveModel() {
 		model.rotation.y -= current_turnSpeed;
 	}
 
-	// Up-Right
+	// Up-Right // Send EEG
 	if(model.position.x > -30 && model.position.z < -60) {
-		keyRest()
-		var result = confirm("페이지가 전환됩니다.")
-		if(result) {
-			window.open("https://www.youtube.com/", "page")
-		}
+		keyReset(new THREE.Vector3(-31, 0, -59));
+		loadPopUp("뇌파 측정", "/eeg");
 	}
-	// Up-Left
+	// Up-Left // Hospital
 	if(model.position.x < -60 && model.position.z < -60) {
-		keyRest()
-		var result = confirm("페이지가 전환됩니다.")
-		if(result) {
-			window.open("https://www.youtube.com/", "page")
-		}
+		keyReset(new THREE.Vector3(-59, 0, -59));
+		loadPopUp("병원 추천", "/map");
 	}
-	// Down-Left
+	// Down-Left // Record
 	if(model.position.x < -60 && model.position.z > -30) {
-		keyRest()
-		var result = confirm("페이지가 전환됩니다.")
-		if(result) {
-			window.open("https://www.youtube.com/", "page")
-		}
+		keyReset(new THREE.Vector3(-59, 0, -31));
+		loadPopUp("기록 확인", "/graph");
 	}
-	// Down-Right
+	// Down-Right // Contact
 	if(model.position.x > -30 && model.position.z > -30) {
-		keyRest()
-		var result = confirm("페이지가 전환됩니다.")
-		if(result) {
-			window.open("https://www.youtube.com/", "page")
-		}
+		keyReset(new THREE.Vector3(-31, 0, -31));
+		loadPopUp("개발자 Git Hub", "https://github.com/KimJaea/JaeJu-GetEEG");
 	}
 }
 
-function keyRest() {
+function keyReset(location) {
 	moveForward = false
 	moveBackward = false
 	turnLeft = false
 	turnRight = false
-	model.position.set(-47, 0, -47)
+	model.position.set(location.x, location.y, location.z)
 }
 
 function setAction (toAction) {	
@@ -296,9 +278,9 @@ function onDocumentMouseDown(event) {
 	raycaster.setFromCamera( mouse, camera );
 	var intersections = raycaster.intersectObjects(objects, true);
 	if ( intersections.length > 0 ) {
-		const object = intersections[ 0 ].object;
+		// const object = intersections[ 0 ].object;
 		callChatBot();
-	}
+	}	
 }
 
 function callChatBot() {
@@ -311,4 +293,30 @@ function callChatBot() {
 		var rasa = document.getElementById("rasaWebchatPro");
 		rasa.style.display = "none";
 	}
+}
+
+function loadTextEng(string_name, string_loc, string_rot) {
+	// Create Text Geometry
+	const loader = new THREE.FontLoader();
+	loader.load( '../static/assets/roboto/Roboto_Regular.json', function(font) {
+		var geometry = new THREE.TextGeometry(string_name, {
+			font: font,
+			size: 3,
+			height: 1,
+		})
+		var text = new THREE.Mesh(geometry, [
+			new THREE.MeshPhongMaterial({ color: 0xad4000 }), //font
+			new THREE.MeshPhongMaterial({ color: 0xffffff }) //side
+		])
+		text.castShadow = true
+		text.position.set(string_loc.x, string_loc.y, string_loc.z)
+		text.rotateY(string_rot)
+		scene.add(text)
+	})
+}
+
+function loadPopUp(page_name, page_add) {
+	document.getElementById("address").innerText = page_add;
+	document.getElementById("text_area").innerText = page_name + " 페이지로 이동하시겠습니까?";
+	document.getElementById("popup").style.display = "block";
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<title>Project JaeJu 3D Seoul Map</title>
+		<title>Project JaeJu Hospital</title>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<meta name="description" content="Project JaeJu" />
@@ -10,25 +10,44 @@
 		<link type="text/css" rel="stylesheet" href="../static/css/main.css">
 	</head>
 	<body>
+		<script>
+			function hideDiv (){
+			  document.getElementById("ann").style.display="none";
+			}
+			self.setTimeout("hideDiv()",5000);	
+		</script>
 		<header>
 			<img class="logo" src="../static/assets//J.png" alt="logo">
 			<nav>
 				<ul class="nav__links">
-					<li><a id="button1" href="/">Main</a></li>
-					<li><a id="button2" href="#">Send EEG</a></li>
+					<li><a id="button1" href="/index">Main</a></li>
+					<li><a id="button2" href="/eeg">Send EEG</a></li>
 					<li><a id="button3" href="#">Hospital</a></li>
-					<li><a id="button4" href="/statistics">Record</a></li>
+					<li><a id="button4" href="/graph">Record</a></li>
 				</ul>
 			</nav>
 			<a class="cta" href="https://github.com/KimJaea/JaeJu-GetEEG" target="_blank"><button>Contact</button></a>
 		</header>
-		<div class="information">
-			병원 정보<br>
-			1. 병원<br>
-			2. 주소<br>
-			3. 링크<br>
-			4. 평점<br>
+		<div class="announcement-left">
+			<br>마우스를 이용해 화면을 움직여보세요.
 		</div>
+		<div class="announcement-left" id="ann">
+			<br><br>병원 목록을 확인하고 싶은 지역을 선택하세요.
+		</div>
+		<!-- Map -->
 		<script type = "module" src="../static/js/map.js"></script>
+		<script src="../static/js/hospital_data.json"></script>
+		<!-- Map Info --> <!-- Scroll Problem -->
+		<div class="information">
+			<div class="map-info-frame">
+				<nav>
+					<ul id="list-info"></ul>
+				</nav>
+			</div>
+		</div>		
+		<!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js" crossorigin="anonymous"></script>
+        <!-- Geocoding API -->
+        <script src="https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAgvWdfxKIz3jNw_ji2E2pxmU0DDfYonjA"></script>
 	</body>
 </html>

@@ -15,18 +15,32 @@
 			<nav>
 				<ul class="nav__links">
 					<li><a id="button1" href="/">Main</a></li>
-					<li><a id="button2" href="/upload">Send EEG</a></li>
+					<li><a id="button2" href="/eeg">Send EEG</a></li>
 					<li><a id="button3" href="/map">Hospital</a></li>
-					<li><a id="button4" href="/statistics">Record</a></li>
+					<li><a id="button4" href="/graph">Record</a></li>
 				</ul>
 			</nav>
 			<a class="cta" href="https://github.com/KimJaea/JaeJu-GetEEG" target="_blank"><button>Contact</button></a>
 		</header>
-		<p>{{value}}이다!</p>
-		<script type="text/javascript">
-			var dp = {{ value|tojson }};
-			document.write("<p>"+dp[0]+"</p>");
-			document.write("<p>"+dp[1]+"</p>");
-		</script>
+		<div class="announcement-whole-unclickable">
+			<br>당신의 우울증 판단 결과입니다.<br><br>
+			<p id="ann"></p><br>
+		</div>
+		<script>
+            window.onload = function() {
+            var dp = {{ value|tojson }};
+            console.log(dp)
+
+            const element = document.getElementById('ann');
+            if(dp[0] == '0') {
+                var per = parseFloat(dp[1]) * 100;
+                element.innerHTML += String(per) + "%의 확률로 우울증이 아닙니다.";
+            } else {
+                var per = parseFloat(dp[1]) * 100;
+                element.innerHTML += String(per) + "%의 확률로 우울증입니다.";
+            }
+        }
+        </script>
+		<script type = "module" src="../static/js/dance.js"></script>
 	</body>
 </html>

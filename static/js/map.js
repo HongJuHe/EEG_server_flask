@@ -3,14 +3,9 @@ import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/t
 import {GLTFLoader} from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js';
 import Stats from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/libs/stats.module.js'
 
-//import {FBXLoader} from '../three.js-master/examples/jsm/loaders/FBXLoader.js'
-//import {DRACOLoader} from '../three.js-master/examples/jsm/loaders/DRACOLoader.js'
-//import vShader from '../shaders/vertexShader.glsl.js'
-//import fShader from '../shaders/fragmentShader.glsl.js'
-//import { TetrahedronBufferGeometry } from '../three.js-master/build/three.module.js';
-
 var container, stats, controls, clock;
 var camera, scene, renderer, geometry, text;
+var ratioWidth = 0.7, ratioHeight = 0.9;
 
 var objects = [], object_selected;
 var mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
@@ -28,11 +23,11 @@ function init() {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	// Set Camera
-	camera = new THREE.PerspectiveCamera( 75, (window.innerWidth * 0.5) / (window.innerHeight * 0.9), 0.5, 1000 );
+	camera = new THREE.PerspectiveCamera( 75, (window.innerWidth * ratioWidth) / (window.innerHeight * ratioHeight), 0.5, 1000 );
 	camera.position.set( 0, 300, 300 );
 	// Set Scene
 	scene = new THREE.Scene();
-	//scene.background = new THREE.Color( 0x349934 );
+	scene.background = new THREE.Color( 0xeeccaa );
 	
 	clock = new THREE.Clock();
 
@@ -52,11 +47,11 @@ function init() {
 
 	// Load Models
 	loadModel();
-	loadText('지역을\n선택하세요.', new THREE.Vector3(0, 50, 0));
+	loadText('선택하세요', new THREE.Vector3(-50, 50, 0));
 	
 	// Set Renderer
 	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-	renderer.setSize( window.innerWidth * 0.5, window.innerHeight * 0.9 );
+	renderer.setSize( window.innerWidth * ratioWidth, window.innerHeight * ratioHeight );
 	renderer.setPixelRatio( Math.min(window.devicePixelRatio, 2) );
 	renderer.setAnimationLoop()
 	renderer.gammaOutput = true;
@@ -95,18 +90,18 @@ function animate() {
 }
 
 function onWindowResize() {
-	camera.aspect = (window.innerWidth * 0.5) / (window.innerHeight * 0.9);
+	camera.aspect = (window.innerWidth * ratioWidth) / (window.innerHeight * ratioHeight );
 	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth * 0.5, window.innerHeight * 0.9 );
+	renderer.setSize( window.innerWidth * ratioWidth, window.innerHeight * ratioHeight );
 }
 
 function loadModel() {
 	// GLTF Object with animation - mesh
-	var loader = new GLTFLoader().setPath('./static/assets/Seoul/')
+	var loader = new GLTFLoader().setPath('../static/assets/Seoul/')
 	loader.load('Seoul.glb', function(gltf) {
         var obj = gltf.scene;
 		obj.position.set(-50, 0, -50)
-		obj.children[0].children[0].material.color.set(0x125612) // Darker
+		obj.children[0].children[0].material.color.set(0x095b09) // Darker
 		scene.add( obj );
         obj.children.forEach( (child, ndx) => {
             objects.push(child)
@@ -115,7 +110,7 @@ function loadModel() {
 	loader.load('Seoul.glb', function(gltf) {
         var obj = gltf.scene;
 		obj.position.set(-50, 0, -50)
-		obj.children[0].children[0].material.color.set(0x349934) // Lighter
+		obj.children[0].children[0].material.color.set(0x349943) // Lighter
 		scene.add( obj );
 	})
 }
@@ -127,7 +122,7 @@ function loadText(string_name, string_loc) {
 
 	// Create Text Geometry
 	const loader = new THREE.FontLoader();
-	loader.load( './static/assets/Do_Hyeon/Do_Hyeon_Regular.json', function(font) {
+	loader.load( '../static/assets/Do_Hyeon/Do_Hyeon_Regular.json', function(font) {
 		geometry = new THREE.TextGeometry(string_name, {
 			font: font,
 			size: 15,
@@ -146,13 +141,15 @@ function loadText(string_name, string_loc) {
 
 function onDocumentMouseDown(event) {
 	event.preventDefault();
-	mouse.x = ( event.clientX / (window.innerWidth * 0.5) ) * 2 - 1;
-	mouse.y = - ( event.clientY / (window.innerHeight * 0.9) - (window.innerHeight * 0.0001) ) * 2 + 1;
+	mouse.x = ( event.clientX / (window.innerWidth * ratioWidth) ) * 2 - 1;
+	mouse.y = - ( event.clientY / (window.innerHeight * ratioHeight) - (window.innerHeight * 0.0001) ) * 2 + 1;
 
 	raycaster.setFromCamera( mouse, camera );
 	var intersections = raycaster.intersectObjects(objects, true);
 	if ( intersections.length > 0 ) {
         if(object_selected) {
+			if(object_selected == intersections[ 0 ].object.parent)
+				return;
             object_selected.scale.setScalar(1)
             object_selected.position.add(new THREE.Vector3(0, -1, 0))
         }
@@ -161,7 +158,6 @@ function onDocumentMouseDown(event) {
         object_selected = object;
         object.scale.z *= 2;
         object.position.add(new THREE.Vector3(0, 1, 0))
-		console.log(object) // print LOCATION INFO
 		
 		var name = object.name;
 		for(let i = 0; i < objects.length; i++) {
@@ -171,5 +167,86 @@ function onDocumentMouseDown(event) {
 		}
 		var loc = new THREE.Vector3(object.position.x - 65, 10, object.position.z - 50);
 		loadText(name, loc);
+
+		getStatement(object.name);
 	}
+}
+
+function getStatement(name) {
+    const data = JSON.parse(JSON.stringify(Params));
+
+    var description = "<hr>";
+    const listInfo = document.getElementById("list-info");
+
+    for (const key in Object.keys(data)) {
+        const Gu = Object.keys(data)[key];
+        
+        if(Gu == name) {
+            const names = Object.values(data[Gu])[0];
+            const scores = Object.values(data[Gu])[1];
+            const links = Object.values(data[Gu])[2];
+            const addresses = Object.values(data[Gu])[3];
+            
+            var maxLength = names.length;
+
+            var order = Object.keys(scores);
+            for(var i = 0; i < maxLength - 1; i++) {
+                for(var j = i+1; j < maxLength; j++) {
+                    if(scores[i] < scores[j]) {
+                        var tmp;    
+                        tmp = scores[i];
+                        scores[i] = scores[j];
+                        scores[j] = tmp;
+
+                        tmp = order[i];
+                        order[i] = order[j];
+                        order[j] = tmp;
+                    }
+                }
+            }
+
+            for(var i = 0; i < maxLength; i++) {
+                var j = order[i];
+                description += makeInformation(names[j], scores[i], links[j], addresses[j]);
+            }
+
+            listInfo.innerHTML = description;
+        }       
+    }
+}
+
+function makeInformation(name, score, link, address) {
+    var string = ''
+
+    string += '<h4>';
+    string += name + '</h4>';
+
+    string += '<h6>';
+    string += address + '</h6>';
+
+    var starCount = 5;
+    while(score >= 1) {
+        string += '<i class="fas fa-star fa-2x"></i>';
+        score -= 1;
+        starCount--;
+    }
+    if(score >= 0.5) {
+        string += '<i class="fas fa-star-half-alt fa-2x"></i>';
+        starCount--;
+    }
+    while(starCount > 0) {
+        string += '<i class="far fa-star fa-2x"></i>';
+        starCount--;
+    }
+
+    string += '<br>';
+    if(link == "없습니다") {
+        string += '<a class="btn btn-xl btn-light me-4" href="#!">';
+        string += '병원 홈페이지 준비중</a>';
+    } else {        
+        string += '<a class="btn btn-dark btn-xl" href="';
+        string += link + '" target="_blank">병원 홈페이지 바로가기</a>';
+    }
+
+    return string + '<p><br><br><br><br><hr color="navy">';
 }
