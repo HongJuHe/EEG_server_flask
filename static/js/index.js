@@ -230,22 +230,22 @@ function moveModel() {
 
 	// Up-Right // Send EEG
 	if(model.position.x < -15 && model.position.z > 15) {
-		keyReset(new THREE.Vector3(-14, 0.4, 14));
+		keyReset(new THREE.Vector3(-11, 0.4, 13));
 		loadPopUp("뇌파 측정", "/eeg");
 	}
 	// Up-Left // Hospital
 	if(model.position.x > 15 && model.position.z > 15) {
-		keyReset(new THREE.Vector3(14, 0.4, 14));
+		keyReset(new THREE.Vector3(16, 0.4, 10));
 		loadPopUp("병원 추천", "/map");
 	}
 	// Down-Left // Record
 	if(model.position.x > 15 && model.position.z < - 15) {
-		keyReset(new THREE.Vector3(14, 0.4, -14));
+		keyReset(new THREE.Vector3(10, 0.4, -13));
 		loadPopUp("기록 확인", "/graph");
 	}
 	// Down-Right // Contact
 	if(model.position.x < -15 && model.position.z < -15) {
-		keyReset(new THREE.Vector3(-14, 0.4, -14));
+		keyReset(new THREE.Vector3(-11, 0.4, -11));
 		loadPopUp("개발자 Git Hub", "https://github.com/KimJaea/JaeJu-GetEEG");
 	}
 }
@@ -256,6 +256,8 @@ function keyReset(location) {
 	turnLeft = false
 	turnRight = false
 	model.position.set(location.x, location.y, location.z)
+	controls.target.set(location.x, location.y + 4.6, location.z);
+	camera.position.set(location.x, location.y + 14.6, location.z -5);
 }
 
 function setAction (toAction) {	

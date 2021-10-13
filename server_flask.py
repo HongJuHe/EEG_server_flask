@@ -73,7 +73,7 @@ def record():
                 if e['input_channel'] == 'socketio':
                     #print(e['parse_data']['intent_ranking'])
                     n = e['parse_data']['intent_ranking'][0]
-                    if n['confidence'] > 0.8:
+                    if n['confidence'] > 0.9:
                         temp_intent.append(n['name'])
 
         if (len(temp_intent) != 0):
@@ -99,7 +99,7 @@ def upload_file():
         f = request.files['file']
         #f_name = secure_filename(f.filename)
         x = dt.datetime.now()
-        f_name = str(x.year)+"_"+str(x.month)+"_"+str(x.day)+".txt" 
+        f_name = str(x.year)+"_"+str(x.month)+"_"+str(x.day)+".txt"
         path_dir = '/home/ubuntu/webpage/static/data/'
         
         f.save(os.path.join(path_dir, f_name))
@@ -136,10 +136,10 @@ def upload_file():
         send_data = []
         if result[0] >= threshold:
             send_data.append(0)
-            send_data.append(result[0])
+            send_data.append(round(result[0], 4))
         else:
             send_data.append(1)
-            send_data.append(result[1])
+            send_data.append(round(result[1], 4))
         
         #send_data = [0, 0.9159774780273438]
 
